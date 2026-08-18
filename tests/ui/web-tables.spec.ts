@@ -1,8 +1,6 @@
 import { test, expect } from '@fixtures/pages.fixture';
 import { createEmployee } from '@test-data/employee';
 
-const ACTIONS_CELL = '';
-
 test('record added via the form appears in the table', async ({
   page,
   homePage,
@@ -32,15 +30,6 @@ test('record added via the form appears in the table', async ({
 
   await test.step('check the record was added to the table', async () => {
     await expect(webTablesPage.registrationModal).toBeHidden();
-    await expect(webTablesPage.rowByEmail(employee.email)).toHaveCount(1);
-    await expect(webTablesPage.cellsByEmail(employee.email)).toHaveText([
-      employee.firstName,
-      employee.lastName,
-      employee.age,
-      employee.email,
-      employee.salary,
-      employee.department,
-      ACTIONS_CELL,
-    ]);
+    await webTablesPage.expectEmployeeRow(employee);
   });
 });

@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import type { Employee } from '@test-data/employee';
 
 export class WebTablesPage {
@@ -6,6 +6,7 @@ export class WebTablesPage {
   readonly header: Locator;
   readonly addNewRecordButton: Locator;
   readonly rows: Locator;
+  readonly columnHeaders: Locator;
 
   readonly registrationModal: Locator;
   readonly firstNameInput: Locator;
@@ -21,6 +22,7 @@ export class WebTablesPage {
     this.header = page.getByRole('heading', { level: 1 });
     this.addNewRecordButton = page.locator('#addNewRecordButton');
     this.rows = page.getByRole('table').locator('tbody tr');
+    this.columnHeaders = page.getByRole('table').getByRole('columnheader');
 
     this.registrationModal = page.getByRole('dialog');
     this.firstNameInput = this.registrationModal.locator('#firstName');
@@ -55,7 +57,24 @@ export class WebTablesPage {
     });
   }
 
-  cellsByEmail(email: string): Locator {
-    return this.rowByEmail(email).getByRole('cell');
+  async expectEmployeeRow(employee: Employee) {
+    const row = this.rowByEmail(employee.email);
+    await expect(row).toHaveCount(1);
+
+    const expectedByColumn: Record<string, string> = {
+      'First Name': employee.firstName,
+      'Last Name': employee.lastName,
+      Age: employee.age,
+      Email: employee.email,
+      Salary: employee.salary,
+      Department: employee.department,
+    };
+    const columns = await this.columnHeaders.allTextContents();
+
+    for (const [column, value] of Object.entries(expectedByColumn)) {
+      const columnIndex = columns.indexOf(column);
+      expect(columnIndex, `table has a "${column}" column`).toBeGreaterThanOrEqual(0);
+      await expect(row.getByRole('cell').nth(columnIndex)).toHaveText(value);
+    }
   }
 }
