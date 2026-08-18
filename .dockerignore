@@ -1,0 +1,12 @@
+node_modules/
+playwright-report/
+test-results/
+blob-report/
+.playwright/
+.git/
+.gitignore
+.DS_Store
+Dockerfile
+.dockerignore
+docker-compose.yml
+README.md

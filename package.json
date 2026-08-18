@@ -12,7 +12,11 @@
     "test:api:parallel": "playwright test --project=api --workers=4 --repeat-each=3",
     "ui-mode": "playwright test --ui",
     "report": "playwright show-report",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "docker:test": "docker compose run --rm --build tests",
+    "docker:test:ui": "docker compose run --rm --build tests npx playwright test --project=ui",
+    "docker:test:api": "docker compose run --rm --build tests npx playwright test --project=api",
+    "docker:report": "docker compose --profile report up --build report"
   },
   "license": "ISC",
   "devDependencies": {

@@ -5,16 +5,37 @@ TypeScript + Playwright tests for https://demoqa.com/.
 - Part A — UI: adding a record to the Web Tables table and checking that it shows up.
 - Part B — API: creating a user, adding a book to their collection and deleting it.
 
-## Setup
+## Docker
+
+Nothing but Docker is needed
+
+```bash
+npm run docker:test        # build the image and run the whole suite
+npm run docker:test:ui     # UI project only
+npm run docker:test:api    # API project only
+npm run docker:report      # HTML report of the last run on http://localhost:9323
+```
+
+Without npm the same thing is:
+
+```bash
+docker compose run --rm --build tests
+docker compose run --rm --build tests npx playwright test --project=ui
+docker compose --profile report up --build report
+```
+
+The image is `mcr.microsoft.com/playwright:v1.62.1-noble`, which already carries Chromium
+and its system libraries; its tag has to be bumped together with `@playwright/test`.
+`CI=true` is set inside the image, so retries and `forbidOnly` behave the way they do on CI.
+`playwright-report/` and `test-results/` are mounted from the repo, so the report and the
+traces of a failed run stay on the host. The container exits with the Playwright exit code.
+
+## Running locally
 
 ```bash
 npm install
 npx playwright install chromium
-```
 
-## Running
-
-```bash
 npm test                  # everything
 npm run test:ui           # UI project only
 npm run test:api          # API project only
