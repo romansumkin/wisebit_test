@@ -8,6 +8,8 @@
     "test:ui": "playwright test --project=ui",
     "test:api": "playwright test --project=api",
     "test:headed": "playwright test --project=ui --headed",
+    "test:parallel": "playwright test --workers=4 --repeat-each=3",
+    "test:api:parallel": "playwright test --project=api --workers=4 --repeat-each=3",
     "ui-mode": "playwright test --ui",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"

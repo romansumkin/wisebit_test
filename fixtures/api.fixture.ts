@@ -1,80 +1,93 @@
 import { test as base, expect } from '@playwright/test';
 import { AccountApi } from '@api-clients/account.api';
 import { BookStoreApi } from '@api-clients/book-store.api';
-import type { AllBooksModal, CreateUserResult, TokenViewModel } from '@api-clients/types';
-import { createCredentials, type Credentials } from '@test-data/user';
+import { AccountSteps } from '@steps/account.steps';
+import { BookStoreSteps } from '@steps/book-store.steps';
+import { UserRegistry } from '@steps/user-registry';
+import { BookCatalog } from '@test-data/book-catalog';
+import type { RegisteredUser } from '@test-data/user';
 
-type RegisteredUser = Credentials & {
-  userId: string;
-  token: string;
-};
-
-type UserWithBook = RegisteredUser & {
-  isbn: string;
-  otherIsbn: string;
+type UserWithBook = {
+  readonly user: RegisteredUser;
+  readonly ownedIsbn: string;
+  readonly notOwnedIsbn: string;
 };
 
 type ApiFixtures = {
   accountApi: AccountApi;
   bookStoreApi: BookStoreApi;
-  createdUsers: RegisteredUser[];
-  catalogIsbns: string[];
-  user: RegisteredUser;
+  userRegistry: UserRegistry;
+  accountSteps: AccountSteps;
+  bookStoreSteps: BookStoreSteps;
+  catalog: BookCatalog;
+  registeredUser: RegisteredUser;
+  userWithEmptyCollection: RegisteredUser;
   userWithBook: UserWithBook;
 };
 
 export const test = base.extend<ApiFixtures>({
-  accountApi: async ({ request }, use) => {
-    await use(new AccountApi(request));
+  accountApi: [
+    async ({ request }, use) => {
+      await use(new AccountApi(request));
+    },
+    { box: true },
+  ],
+
+  bookStoreApi: [
+    async ({ request }, use) => {
+      await use(new BookStoreApi(request));
+    },
+    { box: true },
+  ],
+
+  userRegistry: [
+    async ({ accountApi, bookStoreApi }, use) => {
+      const registry = new UserRegistry(accountApi, bookStoreApi);
+
+      await use(registry);
+
+      if (registry.size > 0) {
+        await test.step(`remove the ${registry.size} user(s) this test created`, () =>
+          registry.cleanUp());
+      }
+    },
+    { box: true },
+  ],
+
+  accountSteps: [
+    async ({ accountApi, userRegistry }, use) => {
+      await use(new AccountSteps(accountApi, userRegistry));
+    },
+    { box: true },
+  ],
+
+  bookStoreSteps: [
+    async ({ bookStoreApi }, use) => {
+      await use(new BookStoreSteps(bookStoreApi));
+    },
+    { box: true },
+  ],
+
+  catalog: async ({ bookStoreSteps }, use) => {
+    await use(new BookCatalog(await bookStoreSteps.catalogIsbns()));
   },
 
-  bookStoreApi: async ({ request }, use) => {
-    await use(new BookStoreApi(request));
+  registeredUser: async ({ accountSteps }, use) => {
+    await use(await accountSteps.register());
   },
 
-  createdUsers: async ({ accountApi, bookStoreApi }, use) => {
-    const users: RegisteredUser[] = [];
+  userWithEmptyCollection: async ({ accountSteps, registeredUser }, use) => {
+    await accountSteps.expectCollectionToBeEmpty(registeredUser);
 
-    await use(users);
-
-    for (const { userId, token } of users) {
-      await bookStoreApi.deleteAllBooks(userId, token).catch(() => {});
-      await accountApi.deleteUser(userId, token).catch(() => {});
-    }
+    await use(registeredUser);
   },
 
-  catalogIsbns: async ({ bookStoreApi }, use) => {
-    const response = await bookStoreApi.listBooks();
-    expect(response.status(), 'GET /BookStore/v1/Books').toBe(200);
+  userWithBook: async ({ bookStoreSteps, userWithEmptyCollection, catalog }, use) => {
+    const [ownedIsbn, notOwnedIsbn] = catalog.randomIsbns(2);
 
-    const { books }: AllBooksModal = await response.json();
-    await use(books.map((book) => book.isbn));
-  },
+    await bookStoreSteps.addBook(userWithEmptyCollection, ownedIsbn);
 
-  user: async ({ accountApi, createdUsers }, use) => {
-    const credentials = createCredentials();
-
-    const created = await accountApi.createUser(credentials);
-    expect(created.status(), 'POST /Account/v1/User').toBe(201);
-    const { userID }: CreateUserResult = await created.json();
-
-    const authorized = await accountApi.generateToken(credentials);
-    expect(authorized.status(), 'POST /Account/v1/GenerateToken').toBe(200);
-    const { token }: TokenViewModel = await authorized.json();
-
-    const registered = { ...credentials, userId: userID, token };
-    createdUsers.push(registered);
-
-    await use(registered);
-  },
-
-  userWithBook: async ({ bookStoreApi, user, catalogIsbns }, use) => {
-    const [isbn, otherIsbn] = catalogIsbns;
-
-    const added = await bookStoreApi.addBooks({ userId: user.userId, isbns: [isbn] }, user.token);
-    expect(added.status(), 'POST /BookStore/v1/Books').toBe(201);
-
-    await use({ ...user, isbn, otherIsbn });
+    await use({ user: userWithEmptyCollection, ownedIsbn, notOwnedIsbn });
   },
 });
 

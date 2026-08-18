@@ -5,11 +5,7 @@ import { bearer, CLEANUP_TIMEOUT } from './http';
 const BASE = '/BookStore/v1';
 
 export class BookStoreApi {
-  readonly request: APIRequestContext;
-
-  constructor(request: APIRequestContext) {
-    this.request = request;
-  }
+  constructor(private readonly request: APIRequestContext) {}
 
   async listBooks(): Promise<APIResponse> {
     return this.request.get(`${BASE}/Books`);
@@ -28,7 +24,7 @@ export class BookStoreApi {
   async deleteBook(payload: DeleteBookPayload, token: string): Promise<APIResponse> {
     return this.request.delete(`${BASE}/Book`, {
       headers: bearer(token),
-      data: payload,
+      data: { userId: payload.userId, isbn: payload.isbn },
     });
   }
 

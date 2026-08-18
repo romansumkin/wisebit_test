@@ -1,17 +1,34 @@
+import { randomItem, randomNumber, randomString } from './random';
+
 export type Employee = {
-  firstName: string;
-  lastName: string;
-  age: string;
-  email: string;
-  salary: string;
-  department: string;
+  readonly firstName: string;
+  readonly lastName: string;
+  readonly age: string;
+  readonly email: string;
+  readonly salary: string;
+  readonly department: string;
 };
 
-export const newEmployee: Employee = {
-  firstName: 'Alden',
-  lastName: 'Cantrell',
-  age: '30',
-  email: 'test@test.com',
-  salary: '12345',
-  department: 'QA',
-};
+const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
+const DEPARTMENTS = ['QA', 'Engineering', 'Insurance', 'Legal', 'Compliance'];
+
+function randomName(): string {
+  const name = randomString(LETTERS, randomNumber(4, 8));
+
+  return name[0].toUpperCase() + name.slice(1);
+}
+
+export function createEmployee(overrides: Partial<Employee> = {}): Employee {
+  const firstName = randomName();
+  const lastName = randomName();
+
+  return {
+    firstName,
+    lastName,
+    age: String(randomNumber(21, 64)),
+    email: `${firstName}.${lastName}.${randomNumber(1000, 9999)}@example.com`.toLowerCase(),
+    salary: String(randomNumber(1_000, 99_999)),
+    department: randomItem(DEPARTMENTS),
+    ...overrides,
+  };
+}

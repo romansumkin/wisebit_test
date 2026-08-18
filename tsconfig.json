@@ -10,10 +10,21 @@
     "noEmit": true,
     "paths": {
       "@api-clients/*": ["./api-clients/*"],
-      "@pages/*": ["./pages/*"],
+      "@asserts/*": ["./asserts/*"],
       "@fixtures/*": ["./fixtures/*"],
+      "@pages/*": ["./pages/*"],
+      "@steps/*": ["./steps/*"],
       "@test-data/*": ["./test-data/*"]
     }
   },
-  "include": ["tests", "pages", "api-clients", "fixtures", "test-data", "playwright.config.ts"]
+  "include": [
+    "api-clients",
+    "asserts",
+    "fixtures",
+    "pages",
+    "steps",
+    "test-data",
+    "tests",
+    "playwright.config.ts"
+  ]
 }

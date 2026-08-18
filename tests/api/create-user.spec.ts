@@ -1,41 +1,24 @@
 import { test, expect } from '@fixtures/api.fixture';
-import type { CreateUserResult, MessageModal, TokenViewModel } from '@api-clients/types';
+import { USER_EXISTS } from '@api-clients/api-errors';
+import { expectApiError } from '@asserts/api-response.assert';
 import { createCredentials } from '@test-data/user';
 
-test('a new user is created and can log in', async ({ accountApi, createdUsers }) => {
+test('a new user is created with an empty collection and can log in', async ({ accountSteps }) => {
   const credentials = createCredentials();
 
-  const userId = await test.step('register a user', async () => {
-    const response = await accountApi.createUser(credentials);
-    expect(response.status()).toBe(201);
+  const created = await accountSteps.createUser(credentials);
+  expect(created.username, 'name of the created user').toBe(credentials.userName);
+  expect(created.books, 'collection of a brand new user').toEqual([]);
 
-    const body: CreateUserResult = await response.json();
-    expect(body.username).toBe(credentials.userName);
-    expect(body.books).toEqual([]);
-
-    return body.userID;
-  });
-
-  await test.step('log in as the new user', async () => {
-    const response = await accountApi.generateToken(credentials);
-    expect(response.status()).toBe(200);
-
-    const body: TokenViewModel = await response.json();
-    expect(body.status).toBe('Success');
-
-    createdUsers.push({ ...credentials, userId, token: body.token });
-  });
+  const session = await accountSteps.logIn(credentials);
+  expect(session.status, 'login result').toBe('Success');
 });
 
-test('registration with an already taken name is rejected', async ({ accountApi, user }) => {
-  const response = await accountApi.createUser({
-    userName: user.userName,
-    password: user.password,
-  });
+test('registration with an already taken name is rejected', async ({
+  accountSteps,
+  registeredUser,
+}) => {
+  const response = await accountSteps.attemptCreateUser(registeredUser);
 
-  expect(response.status()).toBe(406);
-
-  const body: MessageModal = await response.json();
-  expect(body.code).toBe('1204');
-  expect(body.message).toBe('User exists!');
+  await expectApiError(response, USER_EXISTS);
 });

@@ -1,4 +1,9 @@
-export type BookModal = {
+export type Credentials = {
+  readonly userName: string;
+  readonly password: string;
+};
+
+export type Book = {
   isbn: string;
   title: string;
   subTitle: string;
@@ -10,20 +15,20 @@ export type BookModal = {
   website: string;
 };
 
-export type AllBooksModal = {
-  books: BookModal[];
+export type BookList = {
+  books: Book[];
 };
 
 export type CreateUserResult = {
   userID: string;
   username: string;
-  books: BookModal[];
+  books: Book[];
 };
 
 export type UserProfile = {
   userId: string;
   username: string;
-  books: BookModal[];
+  books: Book[];
 };
 
 export type TokenViewModel = {
@@ -33,17 +38,17 @@ export type TokenViewModel = {
   result: string;
 };
 
-export type MessageModal = {
+export type ApiMessage = {
   code: string;
   message: string;
 };
 
 export type AddBooksPayload = {
-  userId: string;
-  isbns: string[];
+  readonly userId: string;
+  readonly isbns: readonly string[];
 };
 
 export type DeleteBookPayload = {
-  userId: string;
-  isbn: string;
+  readonly userId: string;
+  readonly isbn: string;
 };

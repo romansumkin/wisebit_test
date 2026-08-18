@@ -1,36 +1,31 @@
-import { test, expect } from '@fixtures/api.fixture';
-import type { MessageModal, UserProfile } from '@api-clients/types';
+import { test } from '@fixtures/api.fixture';
+import { ISBN_NOT_IN_COLLECTION } from '@api-clients/api-errors';
+import { expectApiError } from '@asserts/api-response.assert';
 
-test('a book is removed from the user collection', async ({ accountApi, bookStoreApi, userWithBook }) => {
-  await test.step('delete the book', async () => {
-    const response = await bookStoreApi.deleteBook(
-      { userId: userWithBook.userId, isbn: userWithBook.isbn },
-      userWithBook.token,
-    );
-    expect(response.status()).toBe(204);
-  });
-
-  await test.step('check the collection is empty', async () => {
-    const response = await accountApi.getUser(userWithBook.userId, userWithBook.token);
-    expect(response.status()).toBe(200);
-
-    const body: UserProfile = await response.json();
-    expect(body.books).toEqual([]);
-  });
-});
-
-test('deleting a book the user does not own is rejected', async ({
-  bookStoreApi,
+test('a book is removed from the user collection', async ({
+  accountSteps,
+  bookStoreSteps,
   userWithBook,
 }) => {
-  const response = await bookStoreApi.deleteBook(
-    { userId: userWithBook.userId, isbn: userWithBook.otherIsbn },
-    userWithBook.token,
-  );
+  const { user, ownedIsbn } = userWithBook;
 
-  expect(response.status()).toBe(400);
+  await accountSteps.expectCollectionToContain(user, ownedIsbn);
 
-  const body: MessageModal = await response.json();
-  expect(body.code).toBe('1206');
-  expect(body.message).toBe("ISBN supplied is not available in User's Collection!");
+  await bookStoreSteps.deleteBook(user, ownedIsbn);
+
+  await accountSteps.expectCollectionNotToContain(user, ownedIsbn);
+});
+
+test('deleting a book the user does not own is rejected and changes nothing', async ({
+  accountSteps,
+  bookStoreSteps,
+  userWithBook,
+}) => {
+  const { user, notOwnedIsbn } = userWithBook;
+  const before = await accountSteps.collectionIsbns(user);
+
+  const response = await bookStoreSteps.attemptDeleteBook(user, notOwnedIsbn);
+
+  await expectApiError(response, ISBN_NOT_IN_COLLECTION);
+  await accountSteps.expectCollectionUnchanged(user, before);
 });
