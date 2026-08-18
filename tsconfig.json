@@ -7,7 +7,13 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "types": ["node"],
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@api-clients/*": ["./api-clients/*"],
+      "@pages/*": ["./pages/*"],
+      "@fixtures/*": ["./fixtures/*"],
+      "@test-data/*": ["./test-data/*"]
+    }
   },
-  "include": ["tests", "pages", "fixtures", "test-data", "playwright.config.ts"]
+  "include": ["tests", "pages", "api-clients", "fixtures", "test-data", "playwright.config.ts"]
 }

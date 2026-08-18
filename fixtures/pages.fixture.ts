@@ -1,7 +1,7 @@
 import { test as base, expect } from '@playwright/test';
-import { HomePage } from '../pages/home.page';
-import { ElementsPage } from '../pages/elements.page';
-import { WebTablesPage } from '../pages/web-tables.page';
+import { HomePage } from '@pages/home.page';
+import { ElementsPage } from '@pages/elements.page';
+import { WebTablesPage } from '@pages/web-tables.page';
 
 type Pages = {
   homePage: HomePage;

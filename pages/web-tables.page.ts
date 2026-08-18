@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { Employee } from '../test-data/employee';
+import type { Employee } from '@test-data/employee';
 
 export class WebTablesPage {
   readonly page: Page;

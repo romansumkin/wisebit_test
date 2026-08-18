@@ -1,5 +1,5 @@
-import { test, expect } from '../fixtures/pages.fixture';
-import { newEmployee } from '../test-data/employee';
+import { test, expect } from '@fixtures/pages.fixture';
+import { newEmployee } from '@test-data/employee';
 
 test('record added via the form appears in the table', async ({
   page,

@@ -9,14 +9,26 @@ export default defineConfig({
   use: {
     baseURL: 'https://demoqa.com',
     trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
-    actionTimeout: 10_000,
-    navigationTimeout: 30_000,
   },
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      name: 'ui',
+      testDir: './tests/ui',
+      use: {
+        ...devices['Desktop Chrome'],
+        screenshot: 'only-on-failure',
+        actionTimeout: 10_000,
+        navigationTimeout: 30_000,
+      },
+    },
+    {
+      name: 'api',
+      testDir: './tests/api',
+      retries: process.env.CI ? 2 : 1,
+      timeout: 60_000,
+      use: {
+        extraHTTPHeaders: { Accept: 'application/json' },
+      },
     },
   ],
 });

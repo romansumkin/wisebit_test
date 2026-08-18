@@ -2,11 +2,13 @@
   "name": "wisebit_test",
   "version": "1.0.0",
   "private": true,
-  "description": "UI tests for demoqa.com (test assignment, part A)",
+  "description": "UI and API tests for demoqa.com (test assignment, parts A and B)",
   "scripts": {
     "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:ui": "playwright test --ui",
+    "test:ui": "playwright test --project=ui",
+    "test:api": "playwright test --project=api",
+    "test:headed": "playwright test --project=ui --headed",
+    "ui-mode": "playwright test --ui",
     "report": "playwright show-report",
     "typecheck": "tsc --noEmit"
   },
