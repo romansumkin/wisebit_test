@@ -9,11 +9,11 @@ export class HomePage {
     this.elementsCard = page.getByRole('heading', { name: 'Elements', exact: true });
   }
 
-  async open() {
+  async open(): Promise<void> {
     await this.page.goto('/');
   }
 
-  async openElementsSection() {
+  async openElementsSection(): Promise<void> {
     await this.elementsCard.click();
   }
 }

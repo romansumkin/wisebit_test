@@ -9,7 +9,7 @@ export class ElementsPage {
     this.webTablesMenuItem = page.locator('a[href="/webtables"]');
   }
 
-  async openWebTables() {
+  async openWebTables(): Promise<void> {
     await this.webTablesMenuItem.click();
   }
 }

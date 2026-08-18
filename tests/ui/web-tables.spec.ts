@@ -1,4 +1,5 @@
 import { test, expect } from '@fixtures/pages.fixture';
+import { expectEmployeeRow } from '@asserts/web-tables.assert';
 import { createEmployee } from '@test-data/employee';
 
 test('record added via the form appears in the table', async ({
@@ -30,6 +31,6 @@ test('record added via the form appears in the table', async ({
 
   await test.step('check the record was added to the table', async () => {
     await expect(webTablesPage.registrationModal).toBeHidden();
-    await webTablesPage.expectEmployeeRow(employee);
+    await expectEmployeeRow(webTablesPage, employee);
   });
 });
