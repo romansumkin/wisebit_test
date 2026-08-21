@@ -1,16 +1,6 @@
 import { test, expect } from '@fixtures/api.fixture';
-import type { AccountApi } from '@api-clients/account.api';
 import { NOT_AUTHORIZED } from '@api-clients/api-errors';
-import type { UserProfile } from '@api-clients/types';
-import { expectJson } from '@asserts/api-response.assert';
-import type { RegisteredUser } from '@test-data/user';
-
-async function collectionIsbns(accountApi: AccountApi, user: RegisteredUser): Promise<string[]> {
-  const response = await accountApi.getUser(user.userId, user.token);
-  const profile = await expectJson<UserProfile>(response, 200, 'get user response');
-
-  return profile.books.map((book) => book.isbn);
-}
+import { collectionIsbns } from '@fixtures/book-collection';
 
 test('a book from the catalog is added to the user collection', async ({
   accountApi,

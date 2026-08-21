@@ -42,4 +42,14 @@ export class WebTablesPage extends BasePage {
       has: this.page.getByRole('cell', { name: email, exact: true }),
     });
   }
+
+  async employeeRowData(email: string): Promise<Record<string, string>> {
+    const row = this.rowByEmail(email);
+    await row.waitFor();
+
+    const headers = await this.columnHeaders.allTextContents();
+    const cells = await row.getByRole('cell').allTextContents();
+
+    return Object.fromEntries(headers.map((header, index) => [header, cells[index]]));
+  }
 }
