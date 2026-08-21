@@ -45,6 +45,11 @@ export const expect = baseExpect.extend({
       pass = true;
     } catch (e) {
       matcherResult = (e as { matcherResult?: { actual?: unknown } }).matcherResult;
+
+      if (!matcherResult) {
+        throw e;
+      }
+
       pass = false;
     }
 
