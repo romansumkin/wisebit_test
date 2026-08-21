@@ -1,7 +1,10 @@
-import { test as base, expect } from '@playwright/test';
+import { test as base, mergeExpects } from '@playwright/test';
+import { expect as webTablesExpect } from '@asserts/web-tables.assert';
 import { HomePage } from '@pages/home.page';
 import { ElementsPage } from '@pages/elements.page';
 import { WebTablesPage } from '@pages/web-tables.page';
+
+export const expect = mergeExpects(webTablesExpect);
 
 type Pages = {
   homePage: HomePage;
@@ -29,5 +32,3 @@ export const test = base.extend<Pages>({
     await use(new WebTablesPage(page));
   },
 });
-
-export { expect };

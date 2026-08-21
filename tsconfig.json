@@ -13,7 +13,6 @@
       "@asserts/*": ["./asserts/*"],
       "@fixtures/*": ["./fixtures/*"],
       "@pages/*": ["./pages/*"],
-      "@steps/*": ["./steps/*"],
       "@test-data/*": ["./test-data/*"]
     }
   },
@@ -22,7 +21,6 @@
     "asserts",
     "fixtures",
     "pages",
-    "steps",
     "test-data",
     "tests",
     "playwright.config.ts"

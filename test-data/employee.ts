@@ -1,4 +1,4 @@
-import { randomItem, randomNumber, randomString } from './random';
+import { faker } from '@faker-js/faker';
 
 export type Employee = {
   readonly firstName: string;
@@ -9,26 +9,21 @@ export type Employee = {
   readonly department: string;
 };
 
-const LETTERS = 'abcdefghijklmnopqrstuvwxyz';
 const DEPARTMENTS = ['QA', 'Engineering', 'Insurance', 'Legal', 'Compliance'];
 
-function randomName(): string {
-  const name = randomString(LETTERS, randomNumber(4, 8));
-
-  return name[0].toUpperCase() + name.slice(1);
-}
-
 export function createEmployee(overrides: Partial<Employee> = {}): Employee {
-  const firstName = randomName();
-  const lastName = randomName();
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
 
   return {
     firstName,
     lastName,
-    age: String(randomNumber(21, 64)),
-    email: `${firstName}.${lastName}.${randomNumber(1000, 9999)}@example.com`.toLowerCase(),
-    salary: String(randomNumber(1_000, 99_999)),
-    department: randomItem(DEPARTMENTS),
+    age: String(faker.number.int({ min: 21, max: 64 })),
+    email: faker.internet
+      .email({ firstName, lastName, provider: 'example.com', allowSpecialCharacters: false })
+      .toLowerCase(),
+    salary: String(faker.number.int({ min: 1_000, max: 99_999 })),
+    department: faker.helpers.arrayElement(DEPARTMENTS),
     ...overrides,
   };
 }

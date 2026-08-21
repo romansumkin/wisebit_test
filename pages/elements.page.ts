@@ -1,13 +1,9 @@
-import type { Locator, Page } from '@playwright/test';
+import { BasePage } from './base.page';
 
-export class ElementsPage {
-  readonly page: Page;
-  readonly webTablesMenuItem: Locator;
+export class ElementsPage extends BasePage {
+  protected readonly path = '/elements';
 
-  constructor(page: Page) {
-    this.page = page;
-    this.webTablesMenuItem = page.locator('a[href="/webtables"]');
-  }
+  readonly webTablesMenuItem = this.page.locator('a[href="/webtables"]');
 
   async openWebTables(): Promise<void> {
     await this.webTablesMenuItem.click();

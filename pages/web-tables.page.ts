@@ -1,38 +1,24 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Locator } from '@playwright/test';
 import type { Employee } from '@test-data/employee';
+import { BasePage } from './base.page';
 
-export class WebTablesPage {
-  readonly page: Page;
-  readonly header: Locator;
-  readonly addNewRecordButton: Locator;
-  readonly rows: Locator;
-  readonly columnHeaders: Locator;
+export class WebTablesPage extends BasePage {
+  protected readonly path = '/webtables';
 
-  readonly registrationModal: Locator;
-  readonly firstNameInput: Locator;
-  readonly lastNameInput: Locator;
-  readonly emailInput: Locator;
-  readonly ageInput: Locator;
-  readonly salaryInput: Locator;
-  readonly departmentInput: Locator;
-  readonly submitButton: Locator;
+  readonly header = this.page.getByRole('heading', { level: 1 });
+  readonly addNewRecordButton = this.page.locator('#addNewRecordButton');
+  readonly rows = this.page.getByRole('table').locator('tbody tr');
+  readonly filledRows = this.rows.filter({ hasText: /\w/ });
+  readonly columnHeaders = this.page.getByRole('table').getByRole('columnheader');
 
-  constructor(page: Page) {
-    this.page = page;
-    this.header = page.getByRole('heading', { level: 1 });
-    this.addNewRecordButton = page.locator('#addNewRecordButton');
-    this.rows = page.getByRole('table').locator('tbody tr');
-    this.columnHeaders = page.getByRole('table').getByRole('columnheader');
-
-    this.registrationModal = page.getByRole('dialog');
-    this.firstNameInput = this.registrationModal.locator('#firstName');
-    this.lastNameInput = this.registrationModal.locator('#lastName');
-    this.emailInput = this.registrationModal.locator('#userEmail');
-    this.ageInput = this.registrationModal.locator('#age');
-    this.salaryInput = this.registrationModal.locator('#salary');
-    this.departmentInput = this.registrationModal.locator('#department');
-    this.submitButton = this.registrationModal.locator('#submit');
-  }
+  readonly registrationModal = this.page.getByRole('dialog');
+  readonly firstNameInput = this.registrationModal.locator('#firstName');
+  readonly lastNameInput = this.registrationModal.locator('#lastName');
+  readonly emailInput = this.registrationModal.locator('#userEmail');
+  readonly ageInput = this.registrationModal.locator('#age');
+  readonly salaryInput = this.registrationModal.locator('#salary');
+  readonly departmentInput = this.registrationModal.locator('#department');
+  readonly submitButton = this.registrationModal.locator('#submit');
 
   async openRegistrationForm(): Promise<void> {
     await this.addNewRecordButton.click();
@@ -56,5 +42,4 @@ export class WebTablesPage {
       has: this.page.getByRole('cell', { name: email, exact: true }),
     });
   }
-
 }

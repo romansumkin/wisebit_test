@@ -53,11 +53,10 @@ Two Playwright projects: `ui` runs in Chromium, `api` launches no browser at all
 
 ```
 api-clients/  transport: one method per endpoint, returns a raw APIResponse
-asserts/      the only code that unpacks an APIResponse
-steps/        business actions built on the clients, each one a test.step
-fixtures/     Page Object fixtures; API fixtures with setup and cleanup
-pages/        Page Objects: home, Elements, Web Tables
-test-data/    generators for users, employees and catalog picks
+asserts/      custom matchers (expect.extend) plus the expectJson helper
+fixtures/     Page Object fixtures; API fixtures with setup and user cleanup
+pages/        Page Objects inheriting BasePage (own open() per page)
+test-data/    faker-based generators for users, employees and catalog picks
 tests/ui/     web-tables.spec.ts
 tests/api/    create-user, add-books, delete-book
 ```
@@ -65,7 +64,7 @@ tests/api/    create-user, add-books, delete-book
 Dependencies point one way only:
 
 ```
-api-clients <- test-data <- asserts <- steps <- fixtures <- tests
+api-clients, pages, test-data <- asserts <- fixtures <- tests
 ```
 
 Every test creates its own user with a generated name, so the suite is safe at any worker
