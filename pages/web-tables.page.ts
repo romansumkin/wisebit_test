@@ -43,13 +43,17 @@ export class WebTablesPage extends BasePage {
     });
   }
 
-  async employeeRowData(email: string): Promise<Record<string, string>> {
+  async employeeRowData(email: string): Promise<Record<string, string> | null> {
     const row = this.rowByEmail(email);
-    await row.waitFor();
+    await row.first().waitFor({ state: 'visible' }).catch(() => {});
+
+    if ((await row.count()) !== 1) {
+      return null;
+    }
 
     const headers = await this.columnHeaders.allTextContents();
     const cells = await row.getByRole('cell').allTextContents();
 
-    return Object.fromEntries(headers.map((header, index) => [header, cells[index]]));
+    return Object.fromEntries(headers.map((header, index) => [header, cells[index] ?? '']));
   }
 }

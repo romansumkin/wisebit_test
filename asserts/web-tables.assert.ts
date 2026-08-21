@@ -15,7 +15,8 @@ export const expect = baseExpect.extend({
       Department: employee.department,
     };
 
-    const pass = Object.entries(expected).every(([key, value]) => actual[key] === value);
+    const pass =
+      actual !== null && Object.entries(expected).every(([key, value]) => actual[key] === value);
 
     return {
       pass,

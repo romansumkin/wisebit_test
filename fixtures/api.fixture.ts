@@ -1,10 +1,11 @@
 import { test as base, mergeExpects } from '@playwright/test';
 import { AccountApi } from '@api-clients/account.api';
 import { BookStoreApi } from '@api-clients/book-store.api';
-import type { BookList, CreateUserResult, TokenViewModel, UserProfile } from '@api-clients/types';
+import type { BookList, CreateUserResult, TokenViewModel } from '@api-clients/types';
 import { expect as apiExpect, expectJson } from '@asserts/api-response.assert';
 import { BookCatalog } from '@test-data/book-catalog';
 import { createCredentials, type RegisteredUser } from '@test-data/user';
+import { collectionIsbns } from './book-collection';
 import { UserRegistry } from './user-registry';
 
 export const expect = mergeExpects(apiExpect);
@@ -86,10 +87,9 @@ export const test = base.extend<ApiFixtures>({
 
   userWithEmptyCollection: async ({ accountApi, registeredUser }, use) => {
     await test.step('check the new collection is empty', async () => {
-      const response = await accountApi.getUser(registeredUser.userId, registeredUser.token);
-      const profile = await expectJson<UserProfile>(response, 200, 'get user response');
+      const isbns = await collectionIsbns(accountApi, registeredUser);
 
-      expect(profile.books, 'collection of a brand new user').toEqual([]);
+      expect(isbns, 'collection of a brand new user').toEqual([]);
     });
 
     await use(registeredUser);
